@@ -51,15 +51,15 @@ class $TodoRemoteAdapter = RemoteAdapter<Todo> with NothingMixin;
 
 //
 
-final todoLocalAdapterProvider = Provider<LocalAdapter<Todo>>((ref) =>
-    $TodoHiveLocalAdapter(
+final todoLocalAdapterProvider = RiverpodAlias.provider<LocalAdapter<Todo>>(
+    (ref) => $TodoHiveLocalAdapter(
         ref.read(hiveLocalStorageProvider), ref.read(graphProvider)));
 
-final todoRemoteAdapterProvider = Provider<RemoteAdapter<Todo>>(
+final todoRemoteAdapterProvider = RiverpodAlias.provider<RemoteAdapter<Todo>>(
     (ref) => $TodoRemoteAdapter(ref.read(todoLocalAdapterProvider)));
 
 final todoRepositoryProvider =
-    Provider<Repository<Todo>>((_) => Repository<Todo>());
+    RiverpodAlias.provider<Repository<Todo>>((_) => Repository<Todo>());
 
 extension TodoX on Todo {
   Todo init([context]) {

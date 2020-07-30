@@ -8,10 +8,17 @@ import 'package:provider/provider.dart' as p;
 import 'main.data.dart';
 
 void main() {
-  // runApp(RiverpodTodoApp());
-  runApp(ProviderTodoApp());
+  runApp(RiverpodTodoApp());
+  // runApp(ProviderTodoApp());
   // runApp(GetItTodoApp());
 }
+
+final initializerProvider = FutureProvider<bool>((ref) async {
+  await ref.read(repositoryInitializerProvider());
+  final repository = ref.read(todoRepositoryProvider);
+  await ref.read(sessionProvider).initialize(repository);
+  return true;
+});
 
 class RiverpodTodoApp extends StatelessWidget {
   @override
@@ -24,7 +31,9 @@ class RiverpodTodoApp extends StatelessWidget {
         home: Scaffold(
           body: Center(
             child: Consumer((context, read) {
-              return read(repositoryInitializerProvider()).when(
+              // could simply use:
+              // read(repositoryInitializerProvider()).when()
+              return read(initializerProvider).when(
                 data: (_) {
                   // Flutter Data repositories are ready at this point!
                   final repository = read(todoRepositoryProvider);
@@ -61,9 +70,13 @@ class ProviderTodoApp extends StatelessWidget {
   Widget build(context) {
     return p.MultiProvider(
       providers: [
-        ...repositoryProviders(
-          clear: true,
-          alsoAwait: () => Future.delayed(Duration(seconds: 3)),
+        ...repositoryProviders(clear: true),
+        p.ProxyProvider<Repository<Todo>, SessionService>(
+          lazy: false,
+          create: (_) => SessionService(),
+          update: (context, repository, service) {
+            return service..initialize(repository);
+          },
         ),
       ],
       child: MaterialApp(
@@ -72,6 +85,8 @@ class ProviderTodoApp extends StatelessWidget {
             child: Builder(
               builder: (context) {
                 if (context.watch<RepositoryInitializer>().isLoading) {
+                  // optionally also check
+                  // context.watch<SessionService>.repository != null
                   return const CircularProgressIndicator();
                 }
                 final repository = context.watch<Repository<Todo>>();
@@ -125,3 +140,14 @@ class GetItTodoApp extends StatelessWidget {
     );
   }
 }
+
+class SessionService {
+  Repository<Todo> repository;
+
+  Future<void> initialize(Repository<Todo> repository) async {
+    await Future.delayed(Duration(seconds: 3));
+    this.repository = repository;
+  }
+}
+
+final sessionProvider = Provider((_) => SessionService());
