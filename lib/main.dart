@@ -14,7 +14,7 @@ void main() {
 }
 
 final initializerProvider = FutureProvider<bool>((ref) async {
-  await ref.read(repositoryInitializerProvider());
+  await ref.read(repositoryInitializerProvider().future);
   final repository = ref.read(todoRepositoryProvider);
   await ref.read(sessionProvider).initialize(repository);
   return true;
@@ -25,7 +25,7 @@ class RiverpodTodoApp extends StatelessWidget {
   Widget build(context) {
     return ProviderScope(
       overrides: [
-        configureRepositoryLocalStorage(clear: false),
+        configureRepositoryLocalStorage(),
       ],
       child: MaterialApp(
         home: Scaffold(
@@ -112,7 +112,7 @@ class ProviderTodoApp extends StatelessWidget {
 class GetItTodoApp extends StatelessWidget {
   @override
   Widget build(context) {
-    GetIt.instance.registerRepositories(clear: false);
+    GetIt.instance.registerRepositories();
     return MaterialApp(
       home: Scaffold(
         body: Center(

@@ -59,12 +59,21 @@ final todoRemoteAdapterProvider = RiverpodAlias.provider<RemoteAdapter<Todo>>(
     (ref) => $TodoRemoteAdapter(ref.read(todoLocalAdapterProvider)));
 
 final todoRepositoryProvider =
-    RiverpodAlias.provider<Repository<Todo>>((_) => Repository<Todo>());
+    RiverpodAlias.provider<Repository<Todo>>((ref) => Repository<Todo>(ref));
 
 extension TodoX on Todo {
+  /// Initializes "fresh" models (i.e. manually instantiated) to use
+  /// [save], [delete] and so on.
+  ///
+  /// Pass:
+  ///  - A `BuildContext` if using Flutter with Riverpod or Provider
+  ///  - Nothing if using Flutter with GetIt
+  ///  - A Riverpod `ProviderContainer` if using pure Dart
+  ///  - Its own [Repository<Todo>]
   Todo init([context]) {
-    return internalLocatorFn(todoRepositoryProvider, context)
-        .internalAdapter
-        .initializeModel(this, save: true) as Todo;
+    final repository = context is Repository<Todo>
+        ? context
+        : internalLocatorFn(todoRepositoryProvider, context);
+    return repository.internalAdapter.initializeModel(this, save: true) as Todo;
   }
 }
