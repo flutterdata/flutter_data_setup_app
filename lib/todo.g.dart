@@ -51,29 +51,63 @@ class $TodoRemoteAdapter = RemoteAdapter<Todo> with NothingMixin;
 
 //
 
-final todoLocalAdapterProvider = RiverpodAlias.provider<LocalAdapter<Todo>>(
-    (ref) => $TodoHiveLocalAdapter(
-        ref.read(hiveLocalStorageProvider), ref.read(graphProvider)));
+final todoLocalAdapterProvider =
+    Provider<LocalAdapter<Todo>>((ref) => $TodoHiveLocalAdapter(ref));
 
-final todoRemoteAdapterProvider = RiverpodAlias.provider<RemoteAdapter<Todo>>(
+final todoRemoteAdapterProvider = Provider<RemoteAdapter<Todo>>(
     (ref) => $TodoRemoteAdapter(ref.read(todoLocalAdapterProvider)));
 
 final todoRepositoryProvider =
-    RiverpodAlias.provider<Repository<Todo>>((ref) => Repository<Todo>(ref));
+    Provider<Repository<Todo>>((ref) => Repository<Todo>(ref));
+
+final _watchTodo = StateNotifierProvider.autoDispose
+    .family<DataStateNotifier<Todo>, WatchArgs<Todo>>((ref, args) {
+  return ref.watch(todoRepositoryProvider).watchOne(args.id,
+      remote: args.remote,
+      params: args.params,
+      headers: args.headers,
+      alsoWatch: args.alsoWatch);
+});
+
+AutoDisposeStateNotifierProvider<DataStateNotifier<Todo>> watchTodo(dynamic id,
+    {bool remote = true,
+    Map<String, dynamic> params = const {},
+    Map<String, String> headers = const {},
+    AlsoWatch<Todo> alsoWatch}) {
+  return _watchTodo(WatchArgs(
+      id: id,
+      remote: remote,
+      params: params,
+      headers: headers,
+      alsoWatch: alsoWatch));
+}
+
+final _watchTodos = StateNotifierProvider.autoDispose
+    .family<DataStateNotifier<List<Todo>>, WatchArgs<Todo>>((ref, args) {
+  ref.maintainState = false;
+  return ref.watch(todoRepositoryProvider).watchAll(
+      remote: args.remote,
+      params: args.params,
+      headers: args.headers,
+      filterLocal: args.filterLocal,
+      syncLocal: args.syncLocal);
+});
+
+AutoDisposeStateNotifierProvider<DataStateNotifier<List<Todo>>> watchTodos(
+    {bool remote, Map<String, dynamic> params, Map<String, String> headers}) {
+  return _watchTodos(
+      WatchArgs(remote: remote, params: params, headers: headers));
+}
 
 extension TodoX on Todo {
   /// Initializes "fresh" models (i.e. manually instantiated) to use
   /// [save], [delete] and so on.
   ///
-  /// Pass:
-  ///  - A `BuildContext` if using Flutter with Riverpod or Provider
-  ///  - Nothing if using Flutter with GetIt
-  ///  - A Riverpod `ProviderContainer` if using pure Dart
-  ///  - Its own [Repository<Todo>]
-  Todo init([context]) {
-    final repository = context is Repository<Todo>
-        ? context
-        : internalLocatorFn(todoRepositoryProvider, context);
-    return repository.internalAdapter.initializeModel(this, save: true) as Todo;
+  /// Requires a `[Reader read]` (unless using GetIt).
+  ///
+  /// Can be obtained via `context.read`, `ref.read`, `container.read`
+  Todo init([Reader read]) {
+    final repository = internalLocatorFn(todoRepositoryProvider, read);
+    return repository.remoteAdapter.initializeModel(this, save: true);
   }
 }
