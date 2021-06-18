@@ -23,7 +23,7 @@ class GetItTodoApp extends StatelessWidget {
                 onDoubleTap: () async {
                   print((await repository.findOne(1, remote: false))?.title);
                   final todo = await Todo(id: 1, title: 'blah')
-                      .init()
+                      .init(_)
                       .save(remote: false);
                   print(keyFor(todo));
                 },
@@ -37,13 +37,16 @@ class GetItTodoApp extends StatelessWidget {
   }
 }
 
+// we can do this as this function will never be called
+T _<T>(ProviderBase<Object?, T> provider) => null as T;
+
 extension GetItFlutterDataX on GetIt {
   void registerRepositories(
-      {FutureFn<String> baseDirFn,
-      List<int> encryptionKey,
-      bool clear,
-      bool remote,
-      bool verbose}) {
+      {FutureFn<String>? baseDirFn,
+      List<int>? encryptionKey,
+      bool clear = false,
+      bool? remote,
+      bool? verbose}) {
     final i = GetIt.instance;
 
     final _container = ProviderContainer(
@@ -59,7 +62,7 @@ extension GetItFlutterDataX on GetIt {
 
     i.registerSingletonAsync<RepositoryInitializer>(() async {
       final init = _container.read(
-          repositoryInitializerProvider(remote: remote, verbose: verbose)
+          repositoryInitializerProvider(remote: remote, verbose: remote)
               .future);
       internalLocatorFn =
           <T extends DataModel<T>>(RootProvider<Object, Repository<T>> provider,
@@ -68,7 +71,7 @@ extension GetItFlutterDataX on GetIt {
       return init;
     });
     i.registerSingletonWithDependencies<Repository<Todo>>(
-        () => _container.read(todoRepositoryProvider),
+        () => _container.read(todosRepositoryProvider),
         dependsOn: [RepositoryInitializer]);
   }
 }

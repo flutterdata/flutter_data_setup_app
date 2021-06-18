@@ -6,14 +6,16 @@ import 'package:flutter_data_setup_app/todo.dart';
 import 'package:flutter_data/flutter_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// ignore_for_file: unused_import
+
 void main() {
   runApp(RiverpodTodoApp());
-  runApp(ProviderTodoApp());
+  // runApp(ProviderTodoApp());
   // runApp(GetItTodoApp());
 }
 
 class SessionService {
-  Repository<Todo> repository;
+  late final Repository<Todo> repository;
 
   Future<void> initialize(Repository<Todo> repository) async {
     await Future.delayed(Duration(seconds: 3));

@@ -8,7 +8,7 @@ import 'todo.dart';
 
 final initializerProvider = FutureProvider<bool>((ref) async {
   await ref.read(repositoryInitializerProvider().future);
-  final repository = ref.read(todoRepositoryProvider);
+  final repository = ref.read(todosRepositoryProvider);
   await ref.read(sessionProvider).initialize(repository);
   return true;
 });
@@ -30,7 +30,7 @@ class RiverpodTodoApp extends StatelessWidget {
                 return read(initializerProvider).when(
                   data: (_) {
                     // Flutter Data repositories are ready at this point!
-                    final repository = read(todoRepositoryProvider);
+                    final repository = read(todosRepositoryProvider);
                     return GestureDetector(
                       onDoubleTap: () async {
                         print((await repository.findOne(1, remote: false))
