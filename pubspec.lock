@@ -215,7 +215,7 @@ packages:
       name: flutter_data
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0-rc2"
+    version: "0.8.0"
   flutter_riverpod:
     dependency: "direct main"
     description:
