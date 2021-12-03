@@ -24,24 +24,23 @@ class RiverpodTodoApp extends StatelessWidget {
         home: Scaffold(
           body: Center(
             child: Consumer(
-              builder: (context, read, child) {
+              builder: (context, ref, child) {
                 // could simply use:
                 // read(repositoryInitializerProvider()).when()
-                return read(initializerProvider).when(
+                return ref.watch(initializerProvider).when(
                   data: (_) {
                     // Flutter Data repositories are ready at this point!
-                    final repository = read(todosRepositoryProvider);
                     return GestureDetector(
                       onDoubleTap: () async {
-                        print((await repository.findOne(1, remote: false))
-                            ?.title);
+                        print(
+                            (await ref.todos.findOne(1, remote: false))?.title);
                         final todo = await Todo(id: 1, title: 'blah')
-                            .init(context.read)
+                            .init(ref.read)
                             .save(remote: false);
                         print(keyFor(todo));
                       },
-                      child:
-                          Text('Hello Flutter Data with Riverpod! $repository'),
+                      child: Text(
+                          'Hello Flutter Data with Riverpod! ${ref.todos}'),
                     );
                   },
                   loading: () {

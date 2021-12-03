@@ -38,7 +38,7 @@ class GetItTodoApp extends StatelessWidget {
 }
 
 // we can do this as this function will never be called
-T _<T>(ProviderBase<Object?, T> provider) => null as T;
+T _<T>(ProviderBase<T> provider) => null as T;
 
 extension GetItFlutterDataX on GetIt {
   void registerRepositories(
@@ -65,8 +65,7 @@ extension GetItFlutterDataX on GetIt {
           repositoryInitializerProvider(remote: remote, verbose: remote)
               .future);
       internalLocatorFn =
-          <T extends DataModel<T>>(RootProvider<Object, Repository<T>> provider,
-                  _) =>
+          <T extends DataModel<T>>(Provider<Repository<T>> provider, _) =>
               _container.read(provider);
       return init;
     });
