@@ -4,7 +4,6 @@ import 'package:flutter_data_setup_app/provider_app.dart';
 import 'package:flutter_data_setup_app/riverpod_app.dart';
 import 'package:flutter_data_setup_app/todo.dart';
 import 'package:flutter_data/flutter_data.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // ignore_for_file: unused_import
 

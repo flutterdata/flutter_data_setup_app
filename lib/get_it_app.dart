@@ -22,9 +22,8 @@ class GetItTodoApp extends StatelessWidget {
               return GestureDetector(
                 onDoubleTap: () async {
                   print((await repository.findOne(1, remote: false))?.title);
-                  final todo = await Todo(id: 1, title: 'blah')
-                      .init(_)
-                      .save(remote: false);
+                  final todo =
+                      await Todo(id: 1, title: 'blah').save(remote: false);
                   print(keyFor(todo));
                 },
                 child: Text('Hello Flutter Data with GetIt! $repository'),
@@ -38,7 +37,7 @@ class GetItTodoApp extends StatelessWidget {
 }
 
 // we can do this as this function will never be called
-T _<T>(ProviderBase<T> provider) => null as T;
+// T _<T>(ProviderBase<T> provider) => null as T;
 
 extension GetItFlutterDataX on GetIt {
   void registerRepositories(
@@ -61,12 +60,10 @@ extension GetItFlutterDataX on GetIt {
     }
 
     i.registerSingletonAsync<RepositoryInitializer>(() async {
-      final init = _container.read(
-          repositoryInitializerProvider(remote: remote, verbose: remote)
-              .future);
-      internalLocatorFn =
-          <T extends DataModel<T>>(Provider<Repository<T>> provider, _) =>
-              _container.read(provider);
+      final init = _container.read(repositoryInitializerProvider.future);
+      // internalLocatorFn =
+      //     <T extends DataModel<T>>(Provider<Repository<T>> provider, _) =>
+      //         _container.read(provider);
       return init;
     });
     i.registerSingletonWithDependencies<Repository<Todo>>(

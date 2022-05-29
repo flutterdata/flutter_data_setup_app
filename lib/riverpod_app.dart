@@ -7,7 +7,7 @@ import 'main.data.dart';
 import 'todo.dart';
 
 final initializerProvider = FutureProvider<bool>((ref) async {
-  await ref.read(repositoryInitializerProvider().future);
+  await ref.read(repositoryInitializerProvider.future);
   final repository = ref.read(todosRepositoryProvider);
   await ref.read(sessionProvider).initialize(repository);
   return true;
@@ -35,7 +35,6 @@ class RiverpodTodoApp extends StatelessWidget {
                         print(
                             (await ref.todos.findOne(1, remote: false))?.title);
                         final todo = await Todo(id: 1, title: 'blah')
-                            .init(ref.read)
                             .save(remote: false);
                         print(keyFor(todo));
                       },

@@ -38,9 +38,8 @@ class ProviderTodoApp extends StatelessWidget {
                 return GestureDetector(
                   onDoubleTap: () async {
                     print((await repository!.findOne(1, remote: false))?.title);
-                    final todo = await Todo(id: 1, title: 'blah')
-                        .init(context.read<ProviderContainer>().read)
-                        .save(remote: false);
+                    final todo =
+                        await Todo(id: 1, title: 'blah').save(remote: false);
                     print(keyFor(todo));
                   },
                   child: Text('Hello Flutter Data with Provider! $repository'),
@@ -73,10 +72,7 @@ List<SingleChildWidget> providers(
       initialData: null,
       create: (context) async {
         return await Provider.of<ProviderContainer>(context, listen: false)
-            .read(
-          repositoryInitializerProvider(remote: remote, verbose: verbose)
-              .future,
-        );
+            .read(repositoryInitializerProvider.future);
       },
     ),
     ProxyProvider<RepositoryInitializer?, Repository<Todo>?>(

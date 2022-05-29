@@ -5,7 +5,7 @@ part 'todo.g.dart';
 
 @JsonSerializable()
 @DataRepository([])
-class Todo with DataModel<Todo> {
+class Todo extends DataModel<Todo> {
   @override
   final int id;
   final String title;
